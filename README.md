@@ -52,8 +52,6 @@ cd afterjob
 cp .env.example .env
 ```
 
-This repository is private until the owner publishes it. Until then, `git clone` only works if you already have access.
-
 Edit `.env` and set at least `GOOGLE_REVIEW_URL`, `PUBLIC_BASE_URL`, `BUSINESS_NAME`, `SECRET_KEY`, `OWNER_PASSWORD`, and `WEBHOOK_SECRET`. Leave `SMTP_*` and `MARKETING_URL` empty unless you have mail. Set `OWNER_PASSWORD` on any VPS reachable from the internet (empty means the admin UI is open).
 
 `PORT` in `.env.example` is unused. The container always listens on 8080.
