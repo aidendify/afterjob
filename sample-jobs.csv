@@ -1,0 +1,4 @@
+customer_name,customer_email,completed_at,job_ref,notes,phone
+Alex Rivera,alex.rivera@example.com,2026-09-01T15:00:00Z,JOB-A,Annual HVAC tune-up,
+Blair Kim,blair.kim@example.com,2026-09-01T16:30:00Z,JOB-B,Clogged drain repair,
+Casey Nguyen,casey.nguyen@example.com,2026-09-01T18:00:00Z,JOB-C,Roof leak inspection,
