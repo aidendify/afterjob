@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Complaints · AfterJob{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1>Complaints</h1>
+    <p class="lede">Unhappy CSAT replies. Private to you — AfterJob never asks these customers for a public review.</p>
+  </div>
+</section>
+
+<section class="card table-wrap">
+  {% if complaints %}
+  <table>
+    <thead>
+      <tr>
+        <th>Customer</th>
+        <th>Email</th>
+        <th>Job ref</th>
+        <th>Score</th>
+        <th>Comment</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in complaints %}
+      <tr>
+        <td><a href="{{ url_for('job_detail', job_id=row.job_id) }}">{{ row.customer_name }}</a></td>
+        <td>{{ row.customer_email }}</td>
+        <td>{{ row.job_ref or "—" }}</td>
+        <td>{{ row.score }}</td>
+        <td>{{ row.comment or "—" }}</td>
+        <td>{{ row.created_at }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No unhappy replies yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

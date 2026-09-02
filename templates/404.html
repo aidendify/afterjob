@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Not found · AfterJob{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Not found</h1>
+  <p>That page or token does not exist.</p>
+  <p><a href="{{ url_for('index') }}">Back to jobs</a></p>
+</section>
+{% endblock %}
