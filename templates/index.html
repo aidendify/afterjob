@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Jobs · AfterJob{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1>Jobs</h1>
+    <p class="lede">Import completed jobs or add one. AfterJob waits, then asks how it went.</p>
+  </div>
+</section>
+
+<nav class="filters" aria-label="Filter by status">
+  <a class="{% if not status %}is-on{% endif %}" href="{{ url_for('index') }}">All ({{ counts.get('all', 0) }})</a>
+  <a class="{% if status == 'queued' %}is-on{% endif %}" href="{{ url_for('index', status='queued') }}">Queued ({{ counts.get('queued', 0) }})</a>
+  <a class="{% if status == 'ready' %}is-on{% endif %}" href="{{ url_for('index', status='ready') }}">Ready ({{ counts.get('ready', 0) }})</a>
+  <a class="{% if status == 'sent' %}is-on{% endif %}" href="{{ url_for('index', status='sent') }}">Sent ({{ counts.get('sent', 0) }})</a>
+  <a class="{% if status == 'happy' %}is-on{% endif %}" href="{{ url_for('index', status='happy') }}">Happy ({{ counts.get('happy', 0) }})</a>
+  <a class="{% if status == 'unhappy' %}is-on{% endif %}" href="{{ url_for('index', status='unhappy') }}">Unhappy ({{ counts.get('unhappy', 0) }})</a>
+  <a class="{% if status == 'skipped' %}is-on{% endif %}" href="{{ url_for('index', status='skipped') }}">Skipped ({{ counts.get('skipped', 0) }})</a>
+</nav>
+
+<div class="grid-two">
+  <section class="card">
+    <h2>Add a job</h2>
+    <form method="post" action="{{ url_for('create_job') }}" class="stack">
+      <label>Customer name <input type="text" name="customer_name" required autocomplete="name"></label>
+      <label>Email <input type="email" name="customer_email" required autocomplete="email"></label>
+      <label>Phone <input type="text" name="phone" autocomplete="tel"></label>
+      <label>Job ref <input type="text" name="job_ref"></label>
+      <label>Completed at <input type="datetime-local" name="completed_at"></label>
+      <label>Notes <textarea name="notes" rows="3" placeholder="What was done"></textarea></label>
+      <button type="submit" class="btn">Save job</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Import CSV</h2>
+    <p class="hint">Header row: <code>customer_name</code> or <code>name</code>, <code>customer_email</code> or <code>email</code>. Optional: <code>completed_at</code> / <code>completed</code>, <code>job_ref</code> / <code>job_id</code>, <code>notes</code>, <code>phone</code>. Missing email rows are skipped.</p>
+    <form method="post" action="{{ url_for('import_jobs') }}" enctype="multipart/form-data" class="stack">
+      <label>CSV file <input type="file" name="file" accept=".csv,text/csv" required></label>
+      <button type="submit" class="btn">Import CSV</button>
+    </form>
+    <p class="hint">Try <code>sample-jobs.csv</code> from the repo — three fictional jobs, no SMTP needed after import.</p>
+  </section>
+</div>
+
+<section class="card table-wrap">
+  {% if jobs %}
+  <table>
+    <thead>
+      <tr>
+        <th>Customer</th>
+        <th>Email</th>
+        <th>Job ref</th>
+        <th>Completed</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for job in jobs %}
+      <tr>
+        <td><a href="{{ url_for('job_detail', job_id=job.id) }}">{{ job.customer_name }}</a></td>
+        <td>{{ job.customer_email }}</td>
+        <td>{{ job.job_ref or "—" }}</td>
+        <td>{{ job.completed_at }}</td>
+        <td><span class="badge badge-{{ job.status }}">{{ job.status }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No jobs yet. Add one on the left or import <code>sample-jobs.csv</code>.</p>
+  {% endif %}
+</section>
+{% endblock %}

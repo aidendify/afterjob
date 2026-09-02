@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ job.customer_name }} · AfterJob{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('index') }}">Jobs</a> / {{ job.customer_name }}</p>
+
+<section class="page-head">
+  <div>
+    <h1>{{ job.customer_name }}</h1>
+    <p class="lede">
+      <a href="mailto:{{ job.customer_email }}">{{ job.customer_email }}</a>
+      {% if job.job_ref %} · {{ job.job_ref }}{% endif %}
+      · <span class="badge badge-{{ job.status }}">{{ job.status }}</span>
+    </p>
+  </div>
+</section>
+
+<section class="card">
+  <dl class="facts">
+    <div><dt>Completed</dt><dd>{{ job.completed_at }}</dd></div>
+    <div><dt>Ask at</dt><dd>{{ job.send_at }}</dd></div>
+    <div><dt>Phone</dt><dd>{{ job.phone or "—" }}</dd></div>
+    <div><dt>Notes</dt><dd>{{ job.notes or "—" }}</dd></div>
+    <div><dt>Score</dt><dd>{{ job.score if job.score is not none else "—" }}</dd></div>
+    <div><dt>Sent</dt><dd>{{ job.sent_at or "—" }}</dd></div>
+  </dl>
+  {% if job.status in ("queued", "ready", "sent") %}
+  <form method="post" action="{{ url_for('skip_job', job_id=job.id) }}" class="status-row">
+    <button class="btn btn-quiet" type="submit">Skip</button>
+  </form>
+  {% endif %}
+</section>
+
+<section class="card">
+  <div class="seq-head">
+    <h2>CSAT ask</h2>
+    <div class="seq-actions">
+      <button type="button" class="btn" id="copy-email">Copy email</button>
+      <button type="button" class="btn btn-quiet" id="copy-link">Copy link</button>
+      {% if smtp_configured and job.status in ("queued", "ready") %}
+      <form method="post" action="{{ url_for('send_now', job_id=job.id) }}">
+        <button type="submit" class="btn">Send now</button>
+      </form>
+      {% endif %}
+      {% if job.status in ("queued", "ready") %}
+      <form method="post" action="{{ url_for('mark_sent', job_id=job.id) }}">
+        <button type="submit" class="btn btn-quiet">Mark sent</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if not smtp_configured %}
+  <p class="hint">SMTP is not configured. Copy the email or link, paste into Gmail, then Mark sent. Set <code>SMTP_HOST</code> in <code>.env</code> to enable sending.</p>
+  {% endif %}
+
+  <p class="subject"><strong>Subject:</strong> {{ email_subject }}</p>
+  <pre class="body" id="email-body">{{ email_body }}</pre>
+  <p class="hint">CSAT link: <code id="csat-url">{{ csat_url }}</code></p>
+</section>
+<script>
+  (function () {
+    var subject = {{ email_subject | tojson }};
+    var body = {{ email_body | tojson }};
+    var link = {{ csat_url | tojson }};
+    var copyEmail = document.getElementById("copy-email");
+    var copyLink = document.getElementById("copy-link");
+    if (copyEmail) {
+      copyEmail.addEventListener("click", function () {
+        copyText("Subject: " + subject + "\n\n" + body, copyEmail);
+      });
+    }
+    if (copyLink) {
+      copyLink.addEventListener("click", function () {
+        copyText(link, copyLink);
+      });
+    }
+  })();
+</script>
+{% endblock %}
